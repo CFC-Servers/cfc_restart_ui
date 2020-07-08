@@ -61,3 +61,4 @@ end
 
 net.Receive( "CFC_RESTART_START", restartUI )
 net.Receive( "CFC_RESTART_STOP", stopRestart )
+

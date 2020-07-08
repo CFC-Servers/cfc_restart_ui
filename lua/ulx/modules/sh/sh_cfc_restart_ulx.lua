@@ -40,3 +40,4 @@ svrestart:help( "Restarts the server after the given time, and alerts all player
 local stopsvrestart = ulx.command( CATEGORY_NAME, "ulx svstoprestart", cfcUlxStopRestart, "!svstoprestart" ) 
 stopsvrestart:defaultAccess( ULib.ACCESS_SUPERADMIN )
 stopsvrestart:help( "Stops the server from restarting." )
+
