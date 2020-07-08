@@ -14,7 +14,6 @@ local function timeLeft()
     return finalTime - SysTime()
 end
 
-
 concommand.Add( "clean", function()
     isOpen = false
 end )
@@ -30,7 +29,6 @@ local function restartUI()
     local curTime = SysTime()
     finalTime = curTime + delay
     hook.Add( "HUDPaint", "CFCDrawRestartAlert", function()
-
 
         if isOpen then
             keyFrame = math.Clamp( keyFrame + 5, 0, ScrW() )

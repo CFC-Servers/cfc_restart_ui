@@ -32,7 +32,6 @@ local function cfcUlxStopRestart( calling_ply, delay )
     net.Broadcast()
 end
 
-
 local svrestart = ulx.command( CATEGORY_NAME, "ulx svrestart", cfcUlxRestart, "!svrestart" )
 svrestart:addParam{ type = ULib.cmds.NumArg, min = 10, max = 600, hint = "Restart Time", ULib.cmds.optional, ULib.cmds.round, default = 30 }
 svrestart:defaultAccess( ULib.ACCESS_SUPERADMIN )
@@ -41,10 +40,3 @@ svrestart:help( "Restarts the server after the given time, and alerts all player
 local stopsvrestart = ulx.command( CATEGORY_NAME, "ulx svstoprestart", cfcUlxStopRestart, "!svstoprestart" ) 
 stopsvrestart:defaultAccess( ULib.ACCESS_SUPERADMIN )
 stopsvrestart:help( "Stops the server from restarting." )
-
-
-
-
-
-
-
