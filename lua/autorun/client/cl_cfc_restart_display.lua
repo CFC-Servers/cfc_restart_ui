@@ -24,7 +24,6 @@ local function restartUI()
     end )
 
     isOpen = true
-    hook.Remove( "HUDPaint", "CFCDrawRestartAlert" )
     local delay = net.ReadInt( 16 )
     local curTime = SysTime()
     finalTime = curTime + delay
@@ -61,4 +60,3 @@ end
 
 net.Receive( "CFC_RESTART_START", restartUI )
 net.Receive( "CFC_RESTART_STOP", stopRestart )
-
