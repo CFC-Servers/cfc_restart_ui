@@ -2,7 +2,7 @@ local finalTime
 local keyFrame = 0
 local isOpen = false
 local flashState = false
-
+local CFCRestart = {}
 surface.CreateFont( "CFC_CALIBRI_20PX_DEFAULT", {
     font = "Calibri",
     extended = false,
@@ -14,16 +14,13 @@ local function timeLeft()
     return finalTime - SysTime()
 end
 
-concommand.Add( "clean", function()
-    isOpen = false
-end )
-
 local function restartUI()
     timer.Create( "CFC_RESTART_FLASHTIMER", 1, 0, function()
         flashState = not flashState
     end )
 
     isOpen = true
+    hook.Remove( "HUDPaint", "CFCDrawRestartAlert" )
     local delay = net.ReadInt( 16 )
     local curTime = SysTime()
     finalTime = curTime + delay
@@ -43,7 +40,19 @@ local function restartUI()
         surface.PlaySound( "ambient/alarms/warningbell1.wav" )
         surface.DrawRect( 0, 5, keyFrame, 50 )
     
-        if flashState and timeLeft() <= 30 then surface.SetDrawColor( Color( 255, 255, 89 ) ) elseif not flashState and timeLeft() <= 30 then surface.SetDrawColor( Color( 255, 0, 0 ) ) elseif timeLeft() > 30 then surface.SetDrawColor( 255, 255, 89 ) end
+        CFCRestart.urgencyTime = 30 -- extracting that 30 out from here, should probably be named something better
+        CFCRestart.defaultDrawColor = Color( 255, 255, 89 )
+
+        local drawColor = self.defaultDrawColor
+
+        if timeLeft() <= self.urgencyTime then
+            if not flashState then
+            drawColor = Color( 255, 0, 0 )
+        end
+end
+
+-- From the wiki: "Providing a Color structure is slower than providing four numbers. You may use Color:Unpack for this."
+surface.SetDrawColor( drawColor:Unpack() )
 
         surface.DrawRect( 0, 4, keyFrame, 5 )
         surface.DrawRect( 0, 50, keyFrame, 5 )
