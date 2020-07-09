@@ -1,3 +1,4 @@
+require( "cfc_restart_lib" )
 local CATEGORY_NAME = "Utility"
 
 if SERVER then
@@ -7,11 +8,9 @@ end
 
 local function cfcRestartTimerCallback()
     timer.Destroy( "CFC_RESTART_TIMER" )
-
-
-    print( "would restart here !" )
-    http.Post( "" ) -- soon™
-    RunConsoleCommand( "changelevel", game.GetMap() )
+    
+    local restarter = CFCRestartLib()
+    restarter:restart()
 end
 
 local function cfcUlxRestart( calling_ply, delay )
