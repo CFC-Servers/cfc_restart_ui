@@ -63,9 +63,9 @@ surface.SetDrawColor( drawColor:Unpack() )
     end )
 end
 
-local function stopRestart()
+local function clearUI()
     isOpen = false
 end
 
 net.Receive( "CFC_RESTART_START", restartUI )
-net.Receive( "CFC_RESTART_STOP", stopRestart )
+net.Receive( "CFC_RESTART_STOP", clearUI )
