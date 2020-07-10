@@ -7,7 +7,7 @@ if SERVER then
 end
 
 local function cfcRestartTimerCallback()
-    timer.Destroy( "CFC_RESTART_TIMER" )
+    timer.Remove( "CFC_RESTART_TIMER" )
     
     local restarter = CFCRestartLib()
     restarter:restart()
