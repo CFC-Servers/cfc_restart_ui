@@ -43,7 +43,7 @@ function rd:RestartUI( delay )
     hook.Add( "HUDPaint", "CFCDrawRestartAlert", function()
 
         if self.isOpen then
-            self.keyFrame = math.Clamp( self.keyFrame + 5, 0, ScrW() )
+            self.keyFrame = math.Clamp( self.keyFrame + 10, 0, ScrW() )
         else
             self.keyFrame = math.Clamp( self.keyFrame - 10, 0, ScrW() )
 
