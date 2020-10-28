@@ -31,15 +31,15 @@ function rd:GetBannerText()
 end
 
 function rd:RestartUI( delay )
-    timer.Create( "CFC_RESTART_FLASHTIMER", 1, 0, function()
+    local curTime = SysTime()
+    self.finalTime = curTime + delay
+    
+    timer.Create( "CFC_RESTART_FLASHTIMER", 0.5, 0, function()
         self.flashState = not self.flashState
     end )
 
     self.isOpen = true
-
-    local curTime = SysTime()
-    self.finalTime = curTime + delay
-
+    
     hook.Add( "HUDPaint", "CFCDrawRestartAlert", function()
 
         if self.isOpen then
@@ -57,7 +57,7 @@ function rd:RestartUI( delay )
         surface.DrawRect( 0, 5, self.keyFrame, 50 )
 
         local drawColor = self.defaultDrawColor
-        if rd:timeLeft() <= self.urgencyTime then
+        if rd:TimeLeft() <= self.urgencyTime then
             if not self.flashState then drawColor = Color( 255, 0, 0 ) end
         end
         
