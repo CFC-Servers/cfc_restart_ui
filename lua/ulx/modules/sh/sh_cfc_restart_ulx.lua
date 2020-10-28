@@ -1,4 +1,4 @@
-require( "cfc_restart_lib" )
+--require( "cfc_restart_lib" )
 local CATEGORY_NAME = "Utility"
 
 if SERVER then

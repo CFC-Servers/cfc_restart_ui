@@ -1,8 +1,3 @@
-local finalTime
-local keyFrame = 0
-local isOpen = false
-local flashState = false
-local CFCRestart = {}
 surface.CreateFont( "CFC_CALIBRI_20PX_DEFAULT", {
     font = "Calibri",
     extended = false,
@@ -10,62 +5,80 @@ surface.CreateFont( "CFC_CALIBRI_20PX_DEFAULT", {
     weight = 500
 })
 
-local function timeLeft()
-    return finalTime - SysTime()
+CFCRestartDisplay = {
+    finalTime = 0,
+    keyFrame = 0,
+    isOpen = false,
+    flashState = false,
+    CFCRestart = {},
+    urgencyTime = 30,
+    defaultDrawColor = Color( 255, 255, 89 ),
+    flashDrawColor = Color( 36, 54, 72 ),
+    restartSound = "ambient/alarms/warningbell1.wav"
+}
+
+local rd = CFCRestartDisplay
+
+function rd:TimeLeft()
+    return self.finalTime - SysTime()
 end
 
-local function restartUI()
+function rd:GetBannerText()
+    local timeLeft = math.Clamp( math.ceil( self:TimeLeft() ), 0, 600 )
+    local formattedTimeLeft = string.FormattedTime( timeLeft, "%i:%02i" )
+
+    return "WARNING: Server Restarting in " .. formattedTimeLeft
+end
+
+function rd:RestartUI( delay )
     timer.Create( "CFC_RESTART_FLASHTIMER", 1, 0, function()
-        flashState = not flashState
+        self.flashState = not self.flashState
     end )
 
-    isOpen = true
-    hook.Remove( "HUDPaint", "CFCDrawRestartAlert" )
-    local delay = net.ReadInt( 16 )
+    self.isOpen = true
+
     local curTime = SysTime()
-    finalTime = curTime + delay
+    self.finalTime = curTime + delay
+
     hook.Add( "HUDPaint", "CFCDrawRestartAlert", function()
 
-        if isOpen then
-            keyFrame = math.Clamp( keyFrame + 5, 0, ScrW() )
+        if seisOpen then
+            self.keyFrame = math.Clamp( self.keyFrame + 5, 0, ScrW() )
         else
-            keyFrame = math.Clamp( keyFrame - 10, 0, ScrW() )
+            self.keyFrame = math.Clamp( self.keyFrame - 10, 0, ScrW() )
 
-            if keyFrame <= 0 then
+            if self.keyFrame <= 0 then
                 hook.Remove( "HUDPaint", "CFCDrawRestartAlert" )
             end
         end
 
-        surface.SetDrawColor( Color( 36, 54, 72 ) )
-        surface.PlaySound( "ambient/alarms/warningbell1.wav" )
-        surface.DrawRect( 0, 5, keyFrame, 50 )
-    
-        CFCRestart.urgencyTime = 30 -- extracting that 30 out from here, should probably be named something better
-        CFCRestart.defaultDrawColor = Color( 255, 255, 89 )
+        surface.SetDrawColor( self.flashDrawColor )
+        surface.PlaySound( self.restartSound )
+        surface.DrawRect( 0, 5, self.keyFrame, 50 )
 
         local drawColor = self.defaultDrawColor
-
         if timeLeft() <= self.urgencyTime then
-            if not flashState then
-            drawColor = Color( 255, 0, 0 )
+            if not self.flashState then drawColor = Color( 255, 0, 0 ) end
         end
-end
-
--- From the wiki: "Providing a Color structure is slower than providing four numbers. You may use Color:Unpack for this."
-surface.SetDrawColor( drawColor:Unpack() )
-
-        surface.DrawRect( 0, 4, keyFrame, 5 )
-        surface.DrawRect( 0, 50, keyFrame, 5 )
+        
+        surface.SetDrawColor( drawColor:Unpack() )
+        surface.DrawRect( 0, 4, self.keyFrame, 5 )
+        surface.DrawRect( 0, 50, self.keyFrame, 5 )
         surface.SetFont( "CFC_CALIBRI_20PX_DEFAULT" )
         surface.SetTextColor( Color( 255, 255, 255 ) )
-        surface.SetTextPos( keyFrame / 2 - 250, 10 )
-        surface.DrawText( "WARNING: Server Restarting in " .. string.FormattedTime( math.Clamp( math.ceil( timeLeft() ), 0, 600  ), "%i:%02i" ) )
+        surface.SetTextPos( self.keyFrame / 2 - 250, 10 )
+        surface.DrawText( self:GetBannerText() )
     end )
 end
 
-local function clearUI()
-    isOpen = false
+function rd:ClearUI()
+    self.isOpen = false
 end
 
-net.Receive( "CFC_RESTART_START", restartUI )
-net.Receive( "CFC_RESTART_STOP", clearUI )
+net.Receive( "CFC_RESTART_START", function()
+    local timeLeft = net.ReadInt( 16 )
+    rd:RestartUI( timeLeft )
+end )
+net.Receive( "CFC_RESTART_STOP", function()
+    rd:ClearUI()
+end )
