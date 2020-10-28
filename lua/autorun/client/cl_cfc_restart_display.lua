@@ -57,7 +57,7 @@ function rd:RestartUI( delay )
         surface.DrawRect( 0, 5, self.keyFrame, 50 )
 
         local drawColor = self.defaultDrawColor
-        if timeLeft() <= self.urgencyTime then
+        if rd:timeLeft() <= self.urgencyTime then
             if not self.flashState then drawColor = Color( 255, 0, 0 ) end
         end
         
