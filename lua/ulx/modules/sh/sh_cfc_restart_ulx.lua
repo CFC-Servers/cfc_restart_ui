@@ -1,0 +1,40 @@
+--require( "cfc_restart_lib" )
+local CATEGORY_NAME = "Utility"
+
+if SERVER then
+    util.AddNetworkString( "CFC_RESTART_START" )
+    util.AddNetworkString( "CFC_RESTART_STOP" )
+end
+
+local function cfcRestartTimerCallback()
+    timer.Remove( "CFC_RESTART_TIMER" )
+    
+    local restarter = CFCRestartLib()
+    restarter:restart()
+end
+
+local function cfcUlxRestart( calling_ply, delay )
+    net.Start( "CFC_RESTART_START" )
+    net.WriteInt( math.Round( delay ),  16 )
+    net.Broadcast()
+
+    timer.Create( "CFC_RESTART_TIMER", delay, 1, cfcRestartTimerCallback )
+    ulx.fancyLogAdmin( calling_ply, "#A told the server to restart in #i seconds", tostring( delay ) )
+end
+
+local function cfcUlxStopRestart( calling_ply, delay )
+    timer.Remove( "CFC_RESTART_TIMER" )
+    ulx.fancyLogAdmin( calling_ply, "#A told the server to stop restarting" )
+
+    net.Start( "CFC_RESTART_STOP" )
+    net.Broadcast()
+end
+
+local svrestart = ulx.command( CATEGORY_NAME, "ulx alertrestart", cfcUlxRestart, "!alertrestart" )
+svrestart:addParam{ type = ULib.cmds.NumArg, min = 10, max = 600, hint = "Restart Time", ULib.cmds.optional, ULib.cmds.round, default = 30 }
+svrestart:defaultAccess( ULib.ACCESS_SUPERADMIN )
+svrestart:help( "Restarts the server after the given time, and alerts all players of a restart." )
+
+local stopsvrestart = ulx.command( CATEGORY_NAME, "ulx stopalertrestart", cfcUlxStopRestart, "!stopalertrestart" ) 
+stopsvrestart:defaultAccess( ULib.ACCESS_SUPERADMIN )
+stopsvrestart:help( "Stops the server from restarting." )
