@@ -18,7 +18,6 @@ local function cfcUlxRestart( calling_ply, delay )
     net.WriteInt( math.Round( delay ),  16 )
     net.Broadcast()
 
-
     timer.Create( "CFC_RESTART_TIMER", delay, 1, cfcRestartTimerCallback )
     ulx.fancyLogAdmin( calling_ply, "#A told the server to restart in #i seconds", tostring( delay ) )
 end
